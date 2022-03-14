@@ -30,10 +30,6 @@ jobs:
         mkdir -p ./ssl
         $ACME --issue  --server letsencrypt --dns dns_cf -d ixacg.com -d *.ixacg.com
         $ACME --installcert -d ixacg.com --key-file ./ssl/ixacg.com.key --fullchain-file ./ssl/ixacg.com.cer
-        $ACME --issue  --server letsencrypt --dns dns_cf -d 991314.xyz.xyz -d *.991314.xyz
-        $ACME --installcert -d 991314.xyz --key-file ./ssl/991314.xyz.key --fullchain-file ./ssl/991314.xyz.cer
-        $ACME --issue  --server letsencrypt --dns dns_cf -d 849999.xyz.xyz -d *.849999.xyz
-        $ACME --installcert -d 849999.xyz --key-file ./ssl/849999.xyz.key --fullchain-file ./ssl/849999.xyz.cer
         zip -r ssl.zip ssl
     - name: Send mail
       uses: dawidd6/action-send-mail@v2
