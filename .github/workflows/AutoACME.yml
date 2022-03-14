@@ -1,3 +1,4 @@
+# 自动申请泛域名ssl证书
 name: Auto ACME
 
 on:
