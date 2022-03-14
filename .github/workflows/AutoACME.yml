@@ -1,0 +1,45 @@
+name: Auto ACME
+
+on:
+  schedule:
+    - cron: "0 2 1 * *"
+  watch:
+    types: [started]
+
+env:
+    ACME: /home/runner/.acme.sh/acme.sh
+    DNSAPI: ${{ secrets.DNSAPI }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install & Configure ACME.SH
+      run: |
+        curl  https://get.acme.sh | sh
+        echo "$DNSAPI" >> /home/runner/.acme.sh/account.conf
+    - name: Issue & Deploy Certificates
+      run: |
+        mkdir -p ./ssl
+        $ACME --issue  --server letsencrypt --dns dns_cf -d ixacg.com -d *.ixacg.com
+        $ACME --installcert -d ixacg.com --key-file ./ssl/ixacg.com.key --fullchain-file ./ssl/ixacg.com.cer
+        $ACME --issue  --server letsencrypt --dns dns_cf -d 991314.xyz.xyz -d *.991314.xyz
+        $ACME --installcert -d 991314.xyz --key-file ./ssl/991314.xyz.key --fullchain-file ./ssl/991314.xyz.cer
+        $ACME --issue  --server letsencrypt --dns dns_cf -d 849999.xyz.xyz -d *.849999.xyz
+        $ACME --installcert -d 849999.xyz --key-file ./ssl/849999.xyz.key --fullchain-file ./ssl/849999.xyz.cer
+        zip -r ssl.zip ssl
+    - name: Send mail
+      uses: dawidd6/action-send-mail@v2
+      with:
+        server_address: smtp.exmail.qq.com
+        server_port: 465
+        username: ${{ secrets.MAILUSERNAME }}
+        password: ${{ secrets.MAILPASSWORD }}
+        subject: GitHub Actions Auto ACME
+        body: Build job of ${{github.repository}} completed successfully!
+        to: stille@ioiox.com
+        from: GitHub Actions Auto ACME
+        attachments: ./ssl.zip
