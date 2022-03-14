@@ -1,4 +1,4 @@
-name: autossl
+name: Auto ACME
 
 on:
   schedule:
