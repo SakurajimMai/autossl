@@ -1,8 +1,6 @@
 name: Auto ACME
 
 on:
-  schedule:
-    - cron: "0 2 1 * *"
   watch:
     types: [started]
 
